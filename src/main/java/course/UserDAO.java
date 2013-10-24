@@ -17,7 +17,11 @@
 
 package course;
 
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.MongoException;
 import sun.misc.BASE64Encoder;
 
 import java.io.UnsupportedEncodingException;
@@ -39,24 +43,16 @@ public class UserDAO {
 
         String passwordHash = makePasswordHash(password, Integer.toString(random.nextInt()));
 
-        // XXX WORK HERE
-        // create an object suitable for insertion into the user collection
-        // be sure to add username and hashed password to the document. problem instructions
-        // will tell you the schema that the documents must follow.
-        BasicDBObject user = new BasicDBObject("_id",username);
-        user.append("password",passwordHash);
+        BasicDBObject user = new BasicDBObject();
 
-
+        user.append("_id", username).append("password", passwordHash);
 
         if (email != null && !email.equals("")) {
-            // XXX WORK HERE
-            // if there is an email address specified, add it to the document too.
-            user.append("email",email);
+            // the provided email address
+            user.append("email", email);
         }
 
         try {
-            // XXX WORK HERE
-            // insert the document into the user collection here
             usersCollection.insert(user);
             return true;
         } catch (MongoException.DuplicateKey e) {
@@ -66,11 +62,9 @@ public class UserDAO {
     }
 
     public DBObject validateLogin(String username, String password) {
-        DBObject user = null;
+        DBObject user;
 
-        // XXX look in the user collection for a user that has this username
-        // assign the result to the user variable.
-        user = usersCollection.find(new BasicDBObject("_id", username)).next();
+        user = usersCollection.findOne(new BasicDBObject("_id", username));
 
         if (user == null) {
             System.out.println("User not in database");
