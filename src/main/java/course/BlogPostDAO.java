@@ -17,12 +17,7 @@
 
 package course;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import com.mongodb.*;
 import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 
 import java.util.ArrayList;
@@ -101,7 +96,7 @@ public class BlogPostDAO {
         post.append("body",body);
         post.append("permalink",permalink);
         post.append("tags",tags);
-        post.append("comments",new ArrayList<String>());
+        post.append("comments",new ArrayList<Object>());
         post.append("date",new Date());
 
         postsCollection.insert(post);
@@ -132,6 +127,15 @@ public class BlogPostDAO {
         // - best solution uses an update command to the database and a suitable
         //   operator to append the comment on to any existing list of comments
 
+        DBObject byPermalink = findByPermalink(permalink);
+        BasicDBList comments = (BasicDBList) byPermalink.get("comments");
+
+        BasicDBObject comment = new BasicDBObject().append("author",name).append("body",body);
+        if (email != null && !email.equals("")) {
+            comment.append("email",email);
+        }
+        comments.add(comment);
+        postsCollection.update(new BasicDBObject("permalink",permalink),byPermalink);
 
 
     }
