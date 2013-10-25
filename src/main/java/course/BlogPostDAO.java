@@ -25,6 +25,8 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BlogPostDAO {
@@ -37,11 +39,8 @@ public class BlogPostDAO {
     // Return a single post corresponding to a permalink
     public DBObject findByPermalink(String permalink) {
 
-        DBObject post = null;
-        // XXX HW 3.2,  Work Here
-
-
-
+        DBObject post = postsCollection.findOne(new BasicDBObject("permalink",permalink));
+        // YYY-XXX HW 3.2,  Work Here
         return post;
     }
 
@@ -49,8 +48,8 @@ public class BlogPostDAO {
     // how many posts are returned.
     public List<DBObject> findByDateDescending(int limit) {
 
-        List<DBObject> posts = null;
-        // XXX HW 3.2,  Work Here
+        List<DBObject> posts = postsCollection.find(new BasicDBObject()).sort(new BasicDBObject("date",-1)).limit(limit) .toArray();
+        // YYY-XXX HW 3.2,  Work Here
         // Return a list of DBObjects, each one a post from the posts collection
 
         return posts;
@@ -67,7 +66,7 @@ public class BlogPostDAO {
 
 
         BasicDBObject post = new BasicDBObject();
-        // XXX HW 3.2, Work Here
+        // YYY-XXX HW 3.2, Work Here
         // Remember that a valid post has the following keys:
         // author, body, permalink, tags, comments, date
         //
@@ -78,6 +77,34 @@ public class BlogPostDAO {
         // - we created the permalink for you above.
 
         // Build the post object and insert it
+        /*
+        {
+	"_id" : ObjectId("513d396da0ee6e58987bae74"),
+	"title" : "Martians to use MongoDB",
+	"author" : "andrew",
+	"body" : "Representatives from the planet Mars announced today that the planet would adopt MongoDB as a planetary standard. Head Martian Flipblip said that MongoDB was the perfect tool to store the diversity of life that exists on Mars.",
+	"permalink" : "martians_to_use_mongodb",
+	"tags" : [
+		"martians",
+		"seti",
+		"nosql",
+		"worlddomination"
+	],
+	"comments" : [ ],
+	"date" : ISODate("2013-03-11T01:54:53.692Z")
+}
+
+
+    */
+        post.append("title",title);
+        post.append("author",username);
+        post.append("body",body);
+        post.append("permalink",permalink);
+        post.append("tags",tags);
+        post.append("comments",new ArrayList<String>());
+        post.append("date",new Date());
+
+        postsCollection.insert(post);
 
 
         return permalink;
